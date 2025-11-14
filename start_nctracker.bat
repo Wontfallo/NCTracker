@@ -24,4 +24,4 @@ echo Default login: admin / admin123
 echo Press Ctrl+C to stop the application
 echo.
 echo ========================================
-streamlit run app.py
+streamlit run Home.py

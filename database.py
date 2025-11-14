@@ -86,6 +86,7 @@ class DatabaseManager:
                     -- Section 4: Correction
                     correction_actions TEXT,
                     evidence_of_completion TEXT,
+                    tags TEXT,
                     
                     -- Section 5: Closure
                     closure_date DATE,
@@ -102,6 +103,12 @@ class DatabaseManager:
                     FOREIGN KEY (assigned_to) REFERENCES users (id)
                 )
             ''')
+
+            # Ensure tags column exists for legacy databases
+            cursor.execute("PRAGMA table_info(ncrs)")
+            existing_columns = [row[1] for row in cursor.fetchall()]
+            if 'tags' not in existing_columns:
+                cursor.execute("ALTER TABLE ncrs ADD COLUMN tags TEXT")
             
             # Comments table
             cursor.execute('''
@@ -251,8 +258,8 @@ class DatabaseManager:
                 capa_number, qe_assigned, nc_owner_assigned, external_notification_required,
                 external_notification_method, problem_category, disposition_action,
                 disposition_instructions, disposition_justification, required_approvals,
-                correction_actions, evidence_of_completion, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                correction_actions, evidence_of_completion, tags, created_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         
         params = (
@@ -290,6 +297,7 @@ class DatabaseManager:
             json.dumps(ncr_data.get('required_approvals', [])),
             json.dumps(ncr_data.get('correction_actions', [])),
             ncr_data.get('evidence_of_completion'),
+            json.dumps(ncr_data.get('tags', [])),
             ncr_data.get('created_by')
         )
         
@@ -310,6 +318,7 @@ class DatabaseManager:
             # Parse JSON fields
             ncr['required_approvals'] = json.loads(ncr.get('required_approvals', '[]'))
             ncr['correction_actions'] = json.loads(ncr.get('correction_actions', '[]'))
+            ncr['tags'] = json.loads(ncr.get('tags', '[]')) if ncr.get('tags') else []
             return ncr
         return None
     
@@ -348,7 +357,14 @@ class DatabaseManager:
         
         query += ' ORDER BY n.created_at DESC'
         
-        return self.execute_query(query, tuple(params))
+        results = self.execute_query(query, tuple(params))
+        for ncr in results:
+            if isinstance(ncr.get('tags'), str):
+                try:
+                    ncr['tags'] = json.loads(ncr['tags'])
+                except json.JSONDecodeError:
+                    ncr['tags'] = []
+        return results
     
     def update_ncr(self, ncr_id: int, update_data: Dict) -> bool:
         """Update NCR data"""
@@ -362,6 +378,8 @@ class DatabaseManager:
             update_data['required_approvals'] = json.dumps(update_data['required_approvals'])
         if 'correction_actions' in update_data:
             update_data['correction_actions'] = json.dumps(update_data['correction_actions'])
+        if 'tags' in update_data:
+            update_data['tags'] = json.dumps(update_data['tags'])
         
         # Add updated_at timestamp
         update_data['updated_at'] = datetime.now().isoformat()

@@ -1,0 +1,484 @@
+/* ===== NCR TRACKER - FIXED DARK MODE ===== */
+/* Simple, high-contrast, readable dark theme */
+
+/* ===== FORCE DARK BACKGROUNDS ===== */
+.stApp {
+    background-color: #0f1419 !important;
+    color: #ffffff !important;
+}
+
+.main {
+    background-color: #0f1419 !important;
+}
+
+.block-container {
+    background-color: #0f1419 !important;
+}
+
+/* ===== SIDEBAR - WHITE TEXT ON DARK ===== */
+[data-testid="stSidebar"] {
+    background-color: #1a1f2e !important;
+    border-right: 1px solid #2d3748 !important;
+}
+
+[data-testid="stSidebar"] * {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] a {
+    color: #ffffff !important;
+}
+
+/* Sidebar Metrics - Make them POP */
+[data-testid="stSidebar"] [data-testid="stMetricValue"] {
+    color: #6366F1 !important;
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stMetricLabel"] {
+    color: #ffffff !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+}
+
+/* Sidebar navigation links */
+[data-testid="stSidebarNav"] a {
+    color: #ffffff !important;
+    background-color: transparent !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+}
+
+[data-testid="stSidebarNav"] a:hover {
+    background-color: rgba(99, 102, 241, 0.2) !important;
+    color: #ffffff !important;
+}
+
+[data-testid="stSidebarNav"] a[aria-current="page"] {
+    background-color: #6366F1 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* ===== TEXT - ALL WHITE ===== */
+h1, h2, h3, h4, h5, h6,
+p, span, div, label, li, td, th {
+    color: #ffffff !important;
+}
+
+.stMarkdown {
+    color: #ffffff !important;
+}
+
+.stMarkdown h1,
+.stMarkdown h2,
+.stMarkdown h3,
+.stMarkdown p {
+    color: #ffffff !important;
+}
+
+/* ===== FORMS - DARK WITH WHITE TEXT ===== */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stNumberInput > div > div > input,
+.stDateInput > div > div > input,
+.stSelectbox > div > div,
+.stMultiSelect > div > div {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+    border: 2px solid #2d3748 !important;
+    border-radius: 8px !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stNumberInput > div > div > input:focus,
+.stDateInput > div > div > input:focus {
+    border-color: #6366F1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+.stTextInput > div > div > input::placeholder,
+.stTextArea > div > div > textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* ===== BUTTONS ===== */
+.stButton > button {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+    border: 2px solid #2d3748 !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+}
+
+.stButton > button:hover {
+    background-color: #2d3748 !important;
+    border-color: #6366F1 !important;
+    transform: translateY(-2px) !important;
+}
+
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%) !important;
+}
+
+/* ===== METRICS ===== */
+[data-testid="stMetricValue"] {
+    color: #ffffff !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #94a3b8 !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+}
+
+[data-testid="stMetricDelta"] {
+    color: #94a3b8 !important;
+}
+
+/* ===== DATAFRAMES/TABLES ===== */
+.dataframe {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+    border: 1px solid #2d3748 !important;
+}
+
+.dataframe th {
+    background-color: #2d3748 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.dataframe td {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+}
+
+.dataframe tr:hover td {
+    background-color: #2d3748 !important;
+}
+
+/* ===== EXPANDERS ===== */
+.streamlit-expanderHeader {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+    border: 1px solid #2d3748 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 14px 16px !important;
+    font-size: 15px !important;
+}
+
+.streamlit-expanderHeader:hover {
+    background-color: #2d3748 !important;
+    border-color: #6366F1 !important;
+}
+
+.streamlit-expanderContent {
+    background-color: #121824 !important;
+    border: 1px solid #2d3748 !important;
+    border-top: none !important;
+    color: #ffffff !important;
+    padding: 16px !important;
+}
+
+/* Make expander text bright white */
+.streamlit-expanderContent * {
+    color: #ffffff !important;
+}
+
+.streamlit-expanderContent p,
+.streamlit-expanderContent span,
+.streamlit-expanderContent div {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+/* ===== TABS ===== */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: #1a1f2e !important;
+    border-radius: 8px !important;
+    padding: 4px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: #ffffff !important;
+    background-color: #2d3748 !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #6366F1 !important;
+    color: #ffffff !important;
+}
+
+/* ===== ALERTS ===== */
+.stAlert {
+    border-radius: 8px !important;
+    color: #ffffff !important;
+}
+
+.stSuccess {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    border-left: 4px solid #22C55E !important;
+    color: #ffffff !important;
+}
+
+.stWarning {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    border-left: 4px solid #F59E0B !important;
+    color: #ffffff !important;
+}
+
+.stError {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-left: 4px solid #EF4444 !important;
+    color: #ffffff !important;
+}
+
+.stInfo {
+    background-color: rgba(6, 182, 212, 0.15) !important;
+    border-left: 4px solid #06B6D4 !important;
+    color: #ffffff !important;
+}
+
+/* ===== CHARTS - PLOTLY FIX - FORCE DARK BACKGROUNDS ===== */
+.stPlotlyChart {
+    background-color: #1a1f2e !important;
+    border: 1px solid #2d3748 !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+}
+
+/* Force plotly backgrounds to be DARK */
+.js-plotly-plot .plotly,
+.js-plotly-plot .plotly .main-svg,
+.plot-container,
+.svg-container,
+.plotly .main-svg,
+.modebar-container {
+    background-color: #1a1f2e !important;
+    background: #1a1f2e !important;
+}
+
+/* Force white text in charts */
+.gtitle,
+.xtitle,
+.ytitle,
+.xtick text,
+.ytick text,
+.legendtext,
+text.legendtext,
+g.legend text {
+    fill: #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* Force dark backgrounds for chart paper and plot areas */
+.bg {
+    fill: #1a1f2e !important;
+}
+
+rect.bg {
+    fill: #1a1f2e !important;
+}
+
+/* Chart container backgrounds */
+[data-testid="stPlotlyChart"] > div {
+    background-color: #1a1f2e !important;
+}
+
+.user-select-none {
+    background-color: #1a1f2e !important;
+}
+
+/* ===== CUSTOM COMPONENTS ===== */
+.metric-card {
+    background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    border-color: #6366F1;
+}
+
+.comment-box {
+    background-color: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-left: 4px solid #6366F1;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    color: #ffffff;
+}
+
+.comment-box strong {
+    color: #6366F1;
+}
+
+.comment-box em {
+    color: #94a3b8;
+}
+
+/* ===== STATUS BADGES - HIGH CONTRAST ===== */
+.status-new {
+    background-color: rgba(6, 182, 212, 0.2);
+    color: #06B6D4;
+    border: 2px solid #06B6D4;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.status-in-progress {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+    border: 2px solid #F59E0B;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.status-pending-approval {
+    background-color: rgba(236, 72, 153, 0.2);
+    color: #EC4899;
+    border: 2px solid #EC4899;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.status-closed {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22C55E;
+    border: 2px solid #22C55E;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+/* ===== NC LEVEL BADGES ===== */
+.nc-level-1 {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+    border: 2px solid #EF4444;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.nc-level-2 {
+    background-color: rgba(249, 115, 22, 0.2);
+    color: #F97316;
+    border: 2px solid #F97316;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.nc-level-3 {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+    border: 2px solid #F59E0B;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.nc-level-4 {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22C55E;
+    border: 2px solid #22C55E;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    font-size: 12px;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1f2e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2d3748;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6366F1;
+}
+
+/* ===== RADIO & CHECKBOX ===== */
+.stRadio label,
+.stCheckbox label {
+    color: #ffffff !important;
+}
+
+/* ===== FOCUS STATES ===== */
+*:focus-visible {
+    outline: 2px solid #6366F1 !important;
+    outline-offset: 2px !important;
+}
