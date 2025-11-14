@@ -1,0 +1,347 @@
+NCTracker Dark-mode Makeover: Repository Analysis and Migration Blueprint
+
+
+
+Repository analysis
+Architecture and flow
+
+Single-script Streamlit app with sidebar-driven routing and custom CSS injection.
+Entrypoint main() sets up session, auth-gates, renders one of: Dashboard, New NCR, Search, Analytics, Users, Settings, or Logout.
+Navigation radio in show_sidebar() chooses views; page state kept in st.session_state.
+Authentication
+Login form in show_login() posting to DatabaseManager.authenticate_user(). Session stores the user dict on success.
+Key views and features
+Dashboard show_dashboard(): KPI metrics (recent counts, avg resolution), pie and bar charts with Plotly, recent NCR expanders with “view details” that switch into show_ncr_detail().
+New NCR show_new_ncr(): 5-section wizard-like UI split into show_section_1(), show_section_2(), show_section_3(), show_section_4(), show_section_5(). Submission handled by submit_ncr() which calls DatabaseManager.create_ncr().
+Search show_search_ncrs(): filter controls -> DatabaseManager.get_ncrs(). Rows open detail view.
+Analytics show_analytics(): monthly trends, category/disposition distribution, resolution histogram, Excel export uses utils.export_to_excel().
+Users show_users(): display/add user with inline SQL write via DatabaseManager.execute_update().
+Settings show_settings(): sample data generation via utils.create_sample_data(), DB clearing placeholder.
+Styling
+A large light-themed CSS block injected at top of app.py using hard-coded white surfaces (e.g., .metric-card background: white), gradients, shadows, and form/input overrides. These work for light mode only and conflict with any dark scheme.
+Data model and utilities
+
+Database schema (SQLite)
+Users table with sha256 password hash implemented in DatabaseManager.init_database() and default admin via DatabaseManager.create_default_admin().
+NCRs table with many nullable columns mapped 1:1 to form fields, plus JSON-serialized string columns for required_approvals and correction_actions. Timestamps are defaulted by SQLite (created_at) with manual updates.
+Comments, attachments, status_history, mentions tables are defined; comments used in show_ncr_detail(). Attachments and status history not yet integrated in UI.
+Utilities utils.py
+Password hashing hash_password().
+Formatting helpers format_date(), get_ncr_status_color(), get_nc_level_color(), format_file_size(), sanitize_filename(), validate_email(), calculate_resolution_time(), get_user_initials().
+Export to Excel export_to_excel().
+Sample data seeding create_sample_data().
+Basic logging setup setup_logging() with file logs; current log file is empty.
+Technical constraints and observations
+
+Single monolith script limits maintainability and testability; styling is embedded in code and light-only.
+Session state holds the multi-step form; form data mapped directly to schema without typed validation.
+JSON in columns means filtering/analytics on approvals/actions is limited inside SQL.
+No database migrations; any schema change must be carefully planned.
+Plotly charts use transparent plot/paper bg; aligning with dark themes will need Plotly template coordination.
+Auth: plaintext sha256 without salts; acceptable for demo, not for production.
+Role model exists but not enforced in UI (no per-view access guards).
+Performance: unindexed queries are fine for small datasets; pagination for NCR list not implemented.
+Screenshot review (current UX and pain points)
+What the images show
+
+Login (dark appearance): Large gradient hero header with brand, central login card with a red primary button; helper card with default admin creds.
+Dashboard (dark appearance): Quick KPIs row, donut and bar charts, recent NCR expanders, left sidebar with small icons and compact metrics.
+UX/UI pain points
+
+Theme inconsistency: the injected CSS was built for light surfaces (white cards), while screenshots show dark backgrounds. This mismatch can lead to low contrast when dark is applied (e.g., white cards on near-black backgrounds with dark text colors).
+Overuse of gradients, heavy shadows: visually busy and harder to meet accessibility contrast in dark mode.
+Focus visibility: no consistent visible focus outline on interactive items for keyboard users.
+Information density: recent NCR list uses multiple expanders; reading at scale is cumbersome; missing sorting/pagination.
+Navigation discoverability: radio-in-sidebar scales poorly as features grow; multipage app gives a more predictable top-left nav.
+Color semantics: status/level chips use pastel gradients made for light backgrounds; they will need reworking for dark contrast.
+Forms: multi-section “buttons 1-5” navigation lacks clear progression and disabled states; no persistent anchor or breadcrumbs.
+Dark-mode design blueprint
+Design tokens (CSS variables)
+
+Color palette
+Neutral (dark surfaces)
+--color-bg-0: #0B1220 (app background)
+--color-bg-1: #0E1526 (surface/containers)
+--color-bg-2: #111827 (elevated surface)
+--color-panel: #131A2B
+--color-border: #1F2937
+Text
+--color-text: #E5E7EB (primary text)
+--color-text-muted: #9CA3AF
+--color-text-inverse: #0B1220
+Brand
+--color-primary-400: #818CF8
+--color-primary-500: #6366F1
+--color-primary-600: #4F46E5
+Secondary and accents
+--color-secondary-500: #06B6D4
+--color-accent-500: #10B981
+Status
+--color-success: #22C55E
+--color-warning: #F59E0B
+--color-error: #EF4444
+Light tints for badges on dark:
+--color-success-100: #052E1B
+--color-warning-100: #2E1B05
+--color-error-100: #2E0B0B
+Interaction states
+--color-hover: rgba(99,102,241,0.08)
+--color-active: rgba(99,102,241,0.16)
+--color-disabled: #374151
+Focus
+--color-focus: #22D3EE
+Typography
+--font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji
+Type scale (rem): --fs-12:0.75, --fs-14:0.875, --fs-16:1, --fs-18:1.125, --fs-20:1.25, --fs-24:1.5, --fs-32:2, --fs-40:2.5
+Line-height: --lh-1:1.2, --lh-2:1.4, --lh-3:1.6
+Spacing (px)
+--space-1:4, --space-2:8, --space-3:12, --space-4:16, --space-5:20, --space-6:24, --space-8:32, --space-10:40
+Radii
+--radius-sm:6px, --radius:8px, --radius-lg:12px, --radius-xl:16px
+Elevation (subtle on dark)
+--shadow-0: none
+--shadow-1: 0 1px 2px rgba(0,0,0,0.35)
+--shadow-2: 0 4px 8px rgba(0,0,0,0.35)
+--shadow-3: 0 8px 24px rgba(0,0,0,0.4)
+Global Streamlit theme config (to place later in  .streamlit/config.toml )
+
+TOML
+[theme]
+base = "dark"
+primaryColor = "#6366F1"
+backgroundColor = "#0B1220"
+secondaryBackgroundColor = "#111827"
+textColor = "#E5E7EB"
+font = "Inter"
+[client]
+showSidebarNavigation = true
+[server]
+headless = true
+Semantic styles
+
+Buttons
+Primary: bg --color-primary-600; hover darken by 8%; focus outline 2px --color-focus; disabled bg --color-disabled, text --color-text-muted.
+Secondary: bg --color-bg-2; border --color-border; text --color-text; hover bg --color-hover; active bg --color-active.
+Inputs
+Field bg --color-bg-1; border 1px --color-border; text --color-text; placeholder --color-text-muted.
+Focus ring: outline 2px --color-focus with 2px offset; do not rely solely on box-shadow for dark mode.
+Cards/Surfaces
+Card bg --color-bg-2; border 1px solid --color-border; text --color-text; elevation --shadow-1; hover elevate to --shadow-2 and add subtle border-color shift to --color-primary-600 at 10% opacity.
+Badges/Chips
+Solid semantic chips with strong foreground contrast: success (#22C55E on #052E1B), warning (#F59E0B on #2E1B05), error (#EF4444 on #2E0B0B), info (#06B6D4 on #071E24). Small uppercase label, semibold.
+Charts
+Use Plotly template "plotly_dark" with custom discrete colorway [#6366F1, #06B6D4, #F59E0B, #22C55E, #EF4444].
+Accessibility targets
+
+Contrast
+Body text and form labels: >= 4.5:1.
+Large headings (>= 18pt/24px): >= 3:1.
+Non-text interactive icons: >= 3:1 against background.
+Keyboard navigation
+All interactive elements reachable with Tab/Shift+Tab in logical order; visible focus ring using --color-focus. No focus traps in expanders/modals.
+Target sizes
+Min touch target 40x40px for buttons and toggles.
+Motion
+Keep subtle; avoid large parallax/rotations in default; respect reduced-motion where feasible.
+Information architecture and navigation
+Multipage structure (pages/ directory)
+
+Root: app.py -> dashboard landing (if authenticated) or redirect to Login.
+Pages:
+pages/01_Dashboard.py
+Purpose: KPI overview, status and level distributions, recent NCRs table with quick actions.
+Data: DatabaseManager.get_dashboard_stats(), DatabaseManager.get_ncrs().
+pages/02_NCR_List.py
+Purpose: Search, filter, sort, paginate NCRs; quick bulk actions.
+Data: DatabaseManager.get_ncrs().
+pages/03_NCR_Detail.py
+Purpose: Read/Write details for a selected NCR; comments; attachments; status transitions.
+Data: DatabaseManager.get_ncr_by_id(), DatabaseManager.update_ncr(), DatabaseManager.get_comments(), DatabaseManager.add_comment(), DatabaseManager.get_attachments().
+pages/04_New_NCR.py
+Purpose: Multi-step creation form (refactor of show_section_1() … show_section_5()), autosave draft.
+Data: DatabaseManager.create_ncr().
+pages/05_Reports.py
+Purpose: Export to Excel/PDF, summary text report, scheduled CSV exports.
+Data: Full NCR list; utilities utils.export_to_excel().
+pages/06_Users.py
+Purpose: Admin-only basic user management.
+Data: DatabaseManager.get_all_users(), writes via DatabaseManager.execute_update().
+pages/90_Settings.py
+Purpose: Theme toggle, density, feature flags, sample-data actions, version info.
+Data: user preference storage (see DB updates).
+pages/99_Logout.py
+Purpose: Clear session and switch to Login.
+Auth guard and redirects
+
+On each page’s top, if st.session_state.user is None, call st.switch_page("Login") (or redirect to root which shows login).
+Login page can be the root route when unauthenticated: factor login UI into components/auth.py and reuse across pages if needed.
+Site map (Mermaid)
+
+graph TD A[Login] --> B[Dashboard] B --> C[NCR List] C --> D[NCR Detail] B --> E[New NCR] B --> F[Reports] B --> G[Settings] B --> H[Users] G --> I[Logout]
+Components and assets plan
+Components (Python)
+
+components/layout.py
+Functions: app_header(title, actions), app_container(), sidebar_brand(), nav_tabs() for secondary tabs within a page, auth_guard().
+components/theme.py
+Functions: inject_theme_css(), theme_toggle(default="dark"), apply_plotly_theme().
+Implementation details: read assets/theme.css and st.markdown injection; st.components.v1.html to run minimal JS for localStorage-backed toggle without page reload flicker (sets data-theme attribute on <html> and stores preference).
+components/chips.py
+status_chip(status), level_chip(level) using solid colors suitable for dark contrast.
+components/toolbar.py
+filter_button(), export_button(), add_button(), segmented controls.
+components/filters_panel.py
+compose reusable filter UI for NCR list and Reports.
+components/toasts.py
+wrapper over st.toast with consistent semantics (success/info/warn/error).
+components/modals.py
+lightweight modal using st.expander or a component pattern for confirmations since native modals are limited.
+Assets
+
+assets/theme.css
+Defines CSS variables for light and dark: :root for light, [data-theme=dark] overrides. Provides mappings for Streamlit class hooks (inputs, buttons, expanders) using variables (no hard-coded white backgrounds).
+assets/theme.js
+Minimal script: on load, read localStorage.theme; set document.documentElement.dataset.theme; listen to window postMessages from Streamlit to flip theme; no full reload required.
+assets/plotly-dark.json
+Optional: custom Plotly template matching brand colors and dark surfaces.
+Theme toggle plan
+
+State and persistence
+In Python: st.session_state.theme default from localStorage via an invisible st.components.v1.html that posts the value back using Streamlit’s postMessage bridge.
+In the header: a toggle or segmented control hooked to st.session_state.theme; on change, push a small script via st.components.v1.html to set data-theme and save to localStorage; do not reconstruct CSS; no full page reload.
+For cross-session persistence per-user, store the preferred theme in DB (see user_preferences below); on login restore preference and push to client.
+Implementation plan (ordered)
+Phase 0: Pre-setup
+
+Create directories: components/, pages/, assets/, .streamlit/.
+Move inline CSS from app.py into assets/theme.css and rework to use variables rather than hard-coded #fff backgrounds.
+Phase 1: Theming foundation
+
+Add .streamlit/config.toml with the dark base values from Section 3.
+Implement components/theme.py:
+inject_theme_css() reads theme.css and st.markdown it early in each page.
+theme_toggle() renders toggle, updates st.session_state.theme, injects assets/theme.js shim to update data-theme and localStorage.
+apply_plotly_theme() sets px.defaults.template = "plotly_dark" and px.defaults.colorway = [primary, secondary, accent].
+Build assets/theme.css with variable sets:
+:root { light variables }
+[data-theme=dark] { overrides for bg/text/borders/shadows }
+Map Streamlit widgets: inputs, buttons, expanders, sidebar, dataframe, spinners, alerts using variables only.
+Ensure consistent focus styles (outline, offset) on all interactive elements.
+Phase 2: Layout and routing
+
+Build components/layout.py with:
+app_header(title, actions=[theme_toggle]) rendering compact header, breadcrumbs placeholder.
+sidebar_brand() rendering logo/title and optional user menu.
+auth_guard() to check st.session_state.user else show login and return False.
+Root app.py becomes minimal:
+Early: inject_theme_css(), apply_plotly_theme().
+If user None → render login form (factored into components/auth.py), else redirect or render Dashboard.
+Enable multipage by moving views into pages/ with numeric prefixes (see IA above).
+Phase 3: Page refactors
+
+Dashboard -> pages/01_Dashboard.py
+KPIs in cards using dark surfaces; charts using dark template.
+Replace recent NCR expanders with a compact table (st.dataframe) with “Open” action.
+NCR List -> pages/02_NCR_List.py
+Reuse components/filters_panel.py; add pagination (client-side).
+Add clear filters and export buttons via components/toolbar.py.
+NCR Detail -> pages/03_NCR_Detail.py
+Header with status and chips; tabs: Details, Investigation, Correction, Comments, History.
+Comments use DatabaseManager.get_comments()/DatabaseManager.add_comment().
+New NCR -> pages/04_New_NCR.py
+Recompose Section 1-5 forms from the existing show_section_* functions into steps; retain session-state model; add autosave “draft” into a temporary table or JSON file (optional).
+Reports -> pages/05_Reports.py
+Excel export via utils.export_to_excel(), basic PDF via reportlab (already in requirements).
+Users, Settings, Logout as defined in IA.
+Phase 4: Database and utilities adjustments (safe, minimal)
+
+Add optional user preferences (for theme and density) to persist across sessions:
+New table user_preferences (id, user_id UNIQUE, theme TEXT, density TEXT, updated_at TIMESTAMP).
+New methods:
+DatabaseManager.get_user_preferences() new
+DatabaseManager.set_user_preferences() new
+On login in root app.py, load preferences and sync theme.
+Harmonize “priority” vs “nc_level”: expose only nc_level in UI; keep priority as legacy (mapped to nc_level on create).
+Add small index recommendations (future): CREATE INDEX on ncrs(status), ncrs(nc_level), ncrs(created_at).
+Phase 5: Polish and accessibility
+
+Replace pastel gradient badges with solid, high-contrast chips.
+Ensure all buttons/links have visible focus outlines.
+Verify color contrast using tokens against target ratios.
+Explicit file/directory plan (new/changed)
+
+Root
+app.py – slim bootstrapping with auth guard and theme injection
+.streamlit/config.toml
+Assets
+assets/theme.css
+assets/theme.js
+assets/plotly-dark.json (optional)
+Components
+components/layout.py
+components/theme.py
+components/chips.py
+components/toolbar.py
+components/filters_panel.py
+components/toasts.py
+components/modals.py
+components/auth.py
+Pages
+pages/01_Dashboard.py
+pages/02_NCR_List.py
+pages/03_NCR_Detail.py
+pages/04_New_NCR.py
+pages/05_Reports.py
+pages/06_Users.py
+pages/90_Settings.py
+pages/99_Logout.py
+Testing and tooling
+Playwright MCP smoke-test plan (after implementation; target http://localhost:8501)
+
+Scenario 1: Login flow
+Launch → wait for Login heading → fill username/password (admin/admin123) → submit → assert Dashboard heading visible.
+Scenario 2: Navigation
+Click “NCR List” in sidebar → assert filters present → apply status filter → assert table updates count label.
+Scenario 3: Detail open
+From list, click an NCR “Open” → assert Detail header contains NCR number → check tabs render.
+Scenario 4: New NCR
+Navigate to New NCR → fill Section 1 minimal fields → step through to Section 5 → enable QE audit → Submit → assert success toast and NCR number text.
+Scenario 5: Reports
+Navigate to Reports → click Export to Excel → assert file download trigger response (or presence of download button).
+Scenario 6: Theme toggle
+Toggle to Light → verify body data-theme attribute changes and background color changes; reload page → verify persistence (localStorage or user pref).
+Scenario 7: Settings and Logout
+Open Settings → change theme → back to Dashboard → Logout → assert login page visible.
+CI-friendly checks
+
+Lint/format: add ruff and black; run ruff check . and black --check .
+Import tests: python -c "import app; import database; import utils" to catch syntax/import errors.
+Minimal pytest
+tests/test_imports.py imports main modules.
+tests/test_db_smoke.py opens DB and calls DatabaseManager.get_dashboard_stats().
+Using Context7 to reference docs (plan)
+
+Resolve and fetch docs for:
+Streamlit theming: “Theming” and “Theme base dark” sections.
+Multipage apps: “Create a multipage app”, “Pages directory”, “st.switch_page”.
+Components: “st.components.v1.html”.
+Session state: “st.session_state”.
+Use context7 resolve-library-id for “streamlit/streamlit” and get-library-docs filtered by topics “theming”, “multipage”, “components”.
+Optional Tavily integration (in-app knowledge/search)
+
+Use Tavily Search API to allow quick web lookup from within “NCR Detail” (e.g., standards references) or “Reports”.
+Dependency additions (proposed):
+tavily-python>=0.3.4
+Optional: requests>=2.32.0 if not present.
+Environment variable:
+TAVILY_API_KEY required in runtime environment.
+UI placement:
+In Settings: set API key via secrets or environment.
+In Detail or Reports: small search box -> call Tavily API -> display bullets with links.
+Summary of changes required (safe refactors)
+Extract and replace inline CSS with variable-driven theme in assets/theme.css; inject via components/theme.py.
+Convert to multipage under pages/; keep app.py as auth and dashboard entry.
+Add localStorage-backed theme toggle via assets/theme.js and components/theme.py; optional per-user persistence via user_preferences table.
+Keep existing DB schema intact; add optional user_preferences table and helper methods; leave NCR schema as-is to avoid a large migration.
+Align Plotly template to dark; ensure chart text and gridlines have sufficient contrast.
+Done: This blueprint includes repository analysis, screenshot-informed UX observations, a dark theme spec with tokens and explicit Streamlit config values, information architecture for a multipage structure, components/assets plan including a no-reload theme toggle, an ordered migration plan with a file tree, and testing/tooling guidance including Playwright MCP, CI checks, Context7 doc usage, and optional Tavily integration details with env requirements.

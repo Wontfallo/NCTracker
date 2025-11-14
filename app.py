@@ -16,6 +16,7 @@ from typing import List, Dict
 # Import our modules
 from database import db
 import utils
+from components import inject_theme_css, apply_plotly_theme
 
 # Page configuration
 st.set_page_config(
@@ -25,572 +26,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Professional CSS Design System
-st.markdown("""
-<style>
-    /* ===== DESIGN TOKENS ===== */
-    :root {
-        /* Primary Brand Colors */
-        --primary-50: #eff6ff;
-        --primary-100: #dbeafe;
-        --primary-200: #bfdbfe;
-        --primary-300: #93c5fd;
-        --primary-400: #60a5fa;
-        --primary-500: #3b82f6;
-        --primary-600: #2563eb;
-        --primary-700: #1d4ed8;
-        --primary-800: #1e40af;
-        --primary-900: #1e3a8a;
-        
-        /* Neutral Grays */
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-200: #e5e7eb;
-        --gray-300: #d1d5db;
-        --gray-400: #9ca3af;
-        --gray-500: #6b7280;
-        --gray-600: #4b5563;
-        --gray-700: #374151;
-        --gray-800: #1f2937;
-        --gray-900: #111827;
-        
-        /* Semantic Colors */
-        --success: #22c55e;
-        --success-light: #dcfce7;
-        --warning: #f59e0b;
-        --warning-light: #fef3c7;
-        --error: #ef4444;
-        --error-light: #fee2e2;
-        --info: #3b82f6;
-        --info-light: #dbeafe;
-        
-        /* Shadows */
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        
-        /* Border Radius */
-        --radius-sm: 6px;
-        --radius: 8px;
-        --radius-md: 10px;
-        --radius-lg: 12px;
-        --radius-xl: 16px;
-        
-        /* Transitions */
-        --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* ===== GLOBAL STYLES ===== */
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        max-width: 1400px;
-    }
-    
-    /* Smooth scrolling */
-    html {
-        scroll-behavior: smooth;
-    }
-    
-    /* ===== HEADER COMPONENTS ===== */
-    .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2.5rem 2rem;
-        border-radius: var(--radius-xl);
-        margin-bottom: 2.5rem;
-        text-align: center;
-        box-shadow: var(--shadow-xl);
-        position: relative;
-        overflow: hidden;
-        animation: fadeIn 0.6s ease-out;
-    }
-    
-    .main-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-    
-    .main-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-        position: relative;
-        z-index: 1;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .main-header p {
-        font-size: 1.125rem;
-        margin: 0.5rem 0 0 0;
-        opacity: 0.95;
-        position: relative;
-        z-index: 1;
-    }
-    
-    /* ===== CARD COMPONENTS ===== */
-    .metric-card {
-        background: white;
-        padding: 1.75rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
-        text-align: center;
-        border: 1px solid var(--gray-200);
-        transition: all var(--transition-base);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
-        transform: scaleX(0);
-        transition: transform var(--transition-base);
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-xl);
-        border-color: var(--primary-300);
-    }
-    
-    .metric-card:hover::before {
-        transform: scaleX(1);
-    }
-    
-    .status-card {
-        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-        padding: 1.75rem;
-        border-radius: var(--radius-lg);
-        border-left: 4px solid var(--primary-500);
-        margin: 0.75rem 0;
-        box-shadow: var(--shadow);
-        transition: all var(--transition-base);
-    }
-    
-    .status-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateX(4px);
-    }
-    
-    .section-header {
-        background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
-        padding: 1rem 1.25rem;
-        border-radius: var(--radius);
-        border-left: 4px solid var(--primary-600);
-        margin: 1.5rem 0 1rem 0;
-        font-weight: 600;
-        color: var(--primary-800);
-        box-shadow: var(--shadow-sm);
-        transition: all var(--transition-base);
-    }
-    
-    .section-header:hover {
-        background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%);
-        transform: translateX(4px);
-    }
-    
-    /* ===== FORM COMPONENTS ===== */
-    .form-section {
-        background: white;
-        padding: 2rem;
-        border-radius: var(--radius-lg);
-        margin: 1.5rem 0;
-        border: 1px solid var(--gray-200);
-        box-shadow: var(--shadow-md);
-        transition: all var(--transition-base);
-    }
-    
-    .form-section:hover {
-        box-shadow: var(--shadow-lg);
-        border-color: var(--primary-200);
-    }
-    
-    /* Enhanced Input Fields */
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea,
-    .stSelectbox > div > div > div,
-    .stNumberInput > div > div > input,
-    .stDateInput > div > div > input {
-        background-color: var(--gray-50) !important;
-        border: 2px solid var(--gray-200) !important;
-        border-radius: var(--radius) !important;
-        padding: 12px 16px !important;
-        min-height: 48px !important;
-        font-size: 1rem !important;
-        transition: all var(--transition-base) !important;
-        color: var(--gray-900) !important;
-        font-weight: 400 !important;
-    }
-    
-    .stTextInput > div > div > input:focus,
-    .stTextArea > div > div > textarea:focus,
-    .stSelectbox > div > div > div:focus,
-    .stNumberInput > div > div > input:focus,
-    .stDateInput > div > div > input:focus {
-        border-color: var(--primary-500) !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-        outline: none !important;
-        background-color: white !important;
-        transform: scale(1.01);
-    }
-    
-    .stTextInput > div > div > input:hover,
-    .stTextArea > div > div > textarea:hover,
-    .stSelectbox > div > div > div:hover,
-    .stNumberInput > div > div > input:hover,
-    .stDateInput > div > div > input:hover {
-        border-color: var(--gray-400) !important;
-        background-color: white !important;
-    }
-    
-    /* Label Enhancement */
-    label {
-        font-weight: 600 !important;
-        font-size: 0.9375rem !important;
-        color: var(--gray-800) !important;
-        margin-bottom: 0.5rem !important;
-        letter-spacing: 0.01em !important;
-    }
-    
-    /* Radio and Checkbox */
-    .stRadio > div,
-    .stCheckbox > div {
-        padding: 0.5rem 0;
-        transition: all var(--transition-base);
-    }
-    
-    .stRadio > div:hover,
-    .stCheckbox > div:hover {
-        background-color: var(--gray-50);
-        border-radius: var(--radius-sm);
-    }
-    
-    /* ===== BUTTON COMPONENTS ===== */
-    .stButton > button {
-        border-radius: var(--radius) !important;
-        font-weight: 600 !important;
-        padding: 0.625rem 1.5rem !important;
-        transition: all var(--transition-base) !important;
-        border: none !important;
-        box-shadow: var(--shadow) !important;
-        letter-spacing: 0.025em !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: var(--shadow-lg) !important;
-    }
-    
-    .stButton > button:active {
-        transform: translateY(0) !important;
-    }
-    
-    .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%) !important;
-    }
-    
-    .stButton > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%) !important;
-    }
-    
-    /* ===== STATUS BADGES ===== */
-    .status-new {
-        background: linear-gradient(135deg, var(--info-light) 0%, var(--primary-100) 100%);
-        color: var(--primary-800);
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        border-left: 4px solid var(--primary-500);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .status-in-progress {
-        background: linear-gradient(135deg, var(--warning-light) 0%, #fde68a 100%);
-        color: #92400e;
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        border-left: 4px solid var(--warning);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .status-pending-approval {
-        background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-        color: #831843;
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        border-left: 4px solid #ec4899;
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .status-closed {
-        background: linear-gradient(135deg, var(--success-light) 0%, #bbf7d0 100%);
-        color: #14532d;
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        border-left: 4px solid var(--success);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    /* NC Level Badges */
-    .nc-level-1 {
-        background: linear-gradient(135deg, var(--error-light) 0%, #fecaca 100%);
-        color: #991b1b;
-        border-left: 4px solid var(--error);
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-        animation: pulse 2s ease-in-out infinite;
-    }
-    
-    .nc-level-2 {
-        background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
-        color: #9a3412;
-        border-left: 4px solid #f97316;
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .nc-level-3 {
-        background: linear-gradient(135deg, var(--warning-light) 0%, #fde68a 100%);
-        color: #92400e;
-        border-left: 4px solid #eab308;
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .nc-level-4 {
-        background: linear-gradient(135deg, var(--success-light) 0%, #bbf7d0 100%);
-        color: #14532d;
-        border-left: 4px solid var(--success);
-        padding: 6px 14px;
-        border-radius: var(--radius);
-        font-weight: 600;
-        display: inline-block;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    /* ===== COMMENT BOX ===== */
-    .comment-box {
-        background: linear-gradient(135deg, var(--info-light) 0%, var(--primary-50) 100%);
-        padding: 1.25rem;
-        border-radius: var(--radius-md);
-        border-left: 4px solid var(--primary-500);
-        margin: 0.75rem 0;
-        box-shadow: var(--shadow);
-        transition: all var(--transition-base);
-    }
-    
-    .comment-box:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateX(4px);
-    }
-    
-    /* ===== SCROLLBAR STYLING ===== */
-    .form-section-scrollable {
-        max-height: 600px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        scrollbar-width: thin;
-        scrollbar-color: var(--primary-300) var(--gray-100);
-    }
-    
-    .form-section-scrollable::-webkit-scrollbar {
-        width: 10px;
-    }
-    
-    .form-section-scrollable::-webkit-scrollbar-track {
-        background: var(--gray-100);
-        border-radius: 10px;
-    }
-    
-    .form-section-scrollable::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, var(--primary-400), var(--primary-500));
-        border-radius: 10px;
-        border: 2px solid var(--gray-100);
-    }
-    
-    .form-section-scrollable::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
-    }
-    
-    /* ===== EXPANDER STYLING ===== */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%) !important;
-        border-radius: var(--radius) !important;
-        border: 1px solid var(--gray-200) !important;
-        font-weight: 600 !important;
-        padding: 1rem !important;
-        transition: all var(--transition-base) !important;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%) !important;
-        border-color: var(--primary-300) !important;
-        box-shadow: var(--shadow-md) !important;
-    }
-    
-    /* ===== DATAFRAME STYLING ===== */
-    .dataframe {
-        border-radius: var(--radius-md) !important;
-        overflow: hidden !important;
-        box-shadow: var(--shadow) !important;
-    }
-    
-    /* ===== METRIC STYLING ===== */
-    [data-testid="stMetricValue"] {
-        font-size: 2rem !important;
-        font-weight: 700 !important;
-        color: var(--gray-900) !important;
-    }
-    
-    [data-testid="stMetricLabel"] {
-        font-size: 0.875rem !important;
-        font-weight: 600 !important;
-        color: var(--gray-600) !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-    }
-    
-    [data-testid="stMetricDelta"] {
-        font-size: 0.875rem !important;
-        font-weight: 500 !important;
-    }
-    
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.8;
-        }
-    }
-    
-    @keyframes rotate {
-        from {
-            transform: rotate(0deg);
-        }
-        to {
-            transform: rotate(360deg);
-        }
-    }
-    
-    /* ===== RESPONSIVE DESIGN ===== */
-    @media (max-width: 768px) {
-        .main-header {
-            padding: 1.5rem 1rem;
-        }
-        
-        .main-header h1 {
-            font-size: 1.75rem;
-        }
-        
-        .metric-card {
-            padding: 1.25rem;
-        }
-        
-        .form-section {
-            padding: 1.25rem;
-        }
-    }
-    
-    /* ===== LOADING STATES ===== */
-    .stSpinner > div {
-        border-color: var(--primary-500) transparent transparent transparent !important;
-    }
-    
-    /* ===== ALERTS & MESSAGES ===== */
-    .stAlert {
-        border-radius: var(--radius-md) !important;
-        border-left-width: 4px !important;
-        box-shadow: var(--shadow) !important;
-    }
-    
-    /* ===== SIDEBAR ENHANCEMENTS ===== */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, var(--gray-50) 0%, white 100%) !important;
-    }
-    
-    [data-testid="stSidebar"] .element-container {
-        transition: all var(--transition-base);
-    }
-    
-    /* ===== HOVER EFFECTS FOR INTERACTIVE ELEMENTS ===== */
-    .element-container:has(.stButton):hover {
-        transform: scale(1.01);
-    }
-    
-    /* ===== PROFESSIONAL SHADOWS FOR DEPTH ===== */
-    .stPlotlyChart {
-        box-shadow: var(--shadow-md) !important;
-        border-radius: var(--radius-lg) !important;
-        padding: 1rem !important;
-        background: white !important;
-        transition: all var(--transition-base) !important;
-    }
-    
-    .stPlotlyChart:hover {
-        box-shadow: var(--shadow-lg) !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Apply shared modern theme styling
+inject_theme_css()
+apply_plotly_theme()
 
 # Session state initialization
 def init_session_state():
@@ -629,19 +67,12 @@ def show_login():
     with col2:
         # Login card with enhanced styling
         st.markdown("""
-        <div style="
-            background: white;
-            padding: 2.5rem 2rem;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
-            border: 1px solid #e5e7eb;
-        ">
+        <div class="login-card">
             <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 style="color: #1f2937; font-weight: 700; font-size: 1.875rem; margin: 0;">
+                <h2>
                     Welcome Back
                 </h2>
-                <p style="color: #6b7280; margin-top: 0.5rem; font-size: 1rem;">
+                <p>
                     Sign in to access your NCR dashboard
                 </p>
             </div>
@@ -665,7 +96,7 @@ def show_login():
             
             st.markdown("<div style='margin: 1.5rem 0 1rem 0;'></div>", unsafe_allow_html=True)
             
-            submitted = st.form_submit_button("🔐 Sign In", type="primary", use_container_width=True)
+            submitted = st.form_submit_button("🔐 Sign In", type="primary", width="stretch")
             
             if submitted:
                 if username and password:
@@ -683,30 +114,23 @@ def show_login():
         
         # Enhanced credentials display with icon
         st.markdown("""
-        <div style="
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-radius: 12px;
-            border-left: 4px solid #3b82f6;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        ">
+        <div class="credentials-card">
             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                 <span style="font-size: 1.5rem; margin-right: 0.75rem;">🔑</span>
-                <strong style="color: #1e40af; font-size: 1.125rem;">Default Admin Account</strong>
+                <strong style="font-size: 1.125rem;">Default Admin Account</strong>
             </div>
-            <div style="color: #1e40af; line-height: 1.8;">
+            <div style="line-height: 1.8;">
                 <div style="margin: 0.5rem 0;">
                     <strong>Username:</strong>
-                    <code style="background: white; padding: 4px 8px; border-radius: 4px; margin-left: 0.5rem;">admin</code>
+                    <code style="margin-left: 0.5rem;">admin</code>
                 </div>
                 <div style="margin: 0.5rem 0;">
                     <strong>Password:</strong>
-                    <code style="background: white; padding: 4px 8px; border-radius: 4px; margin-left: 0.5rem;">admin123</code>
+                    <code style="margin-left: 0.5rem;">admin123</code>
                 </div>
             </div>
-            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #bfdbfe;">
-                <small style="color: #1e40af; font-style: italic;">
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(148, 163, 184, 0.25);">
+                <small style="font-style: italic;">
                     🔒 Please change the password after first login for security
                 </small>
             </div>
@@ -1763,7 +1187,7 @@ def show_users():
         df = pd.DataFrame(users)
         st.dataframe(
             df[['username', 'full_name', 'role', 'department']],
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
         
